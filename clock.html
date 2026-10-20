@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>화이팅!쌤 시계</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Black+Han+Sans&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:transparent;font-family:'Gowun Dodum',system-ui,sans-serif}
+.card{height:100%;min-height:170px;border-radius:22px;padding:18px 22px;color:#fff;position:relative;overflow:hidden;
+background:linear-gradient(135deg,#7b5cff 0%,#c45bff 50%,#ff7aa8 100%);display:flex;flex-direction:column;justify-content:center}
+.card:before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.14);top:-90px;right:-60px}
+.card:after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.10);bottom:-60px;left:-40px}
+.greet{font-size:14px;opacity:.95;position:relative}
+.time{font-family:'Black Han Sans',sans-serif;font-size:clamp(40px,11vw,68px);letter-spacing:2px;line-height:1.05;position:relative;text-shadow:0 4px 18px rgba(60,0,120,.25)}
+.time small{font-size:.38em;margin-left:6px;opacity:.85}
+.date{font-size:16px;margin-top:4px;position:relative}
+.pill{display:inline-block;margin-top:10px;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.22);font-size:13px;position:relative;backdrop-filter:blur(4px)}
+</style></head>
+<body><div class="card">
+<div class="greet" id="g">좋은 하루예요, 선생님!</div>
+<div class="time" id="t">--:--<small id="s">--</small></div>
+<div class="date" id="d"></div>
+<div class="pill" id="p">💖 화이팅!쌤 교무수첩</div>
+</div>
+<script>
+const W=['일','월','화','수','목','금','토'];
+const tips=['오늘도 아이들 곁에 있는 선생님이 최고예요 ✨','기록 한 줄이 학기말을 바꿔요 ✍️','물 한 잔 마시고 시작해요 💧','완벽보다 꾸준함! 🌱','오늘의 칭찬 한 마디, 준비됐나요? 🌟'];
+function tick(){const n=new Date();const h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+document.getElementById('t').firstChild.nodeValue=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+document.getElementById('s').textContent=String(s).padStart(2,'0');
+document.getElementById('d').textContent=n.getFullYear()+'년 '+(n.getMonth()+1)+'월 '+n.getDate()+'일 '+W[n.getDay()]+'요일';
+let g=h<6?'늦은 시간까지 고생 많으세요 🌙':h<11?'좋은 아침이에요, 선생님! ☀️':h<14?'점심 맛있게 드세요 🍚':h<17?'오후 수업도 화이팅! 💪':'오늘 하루도 수고 많으셨어요 🌇';
+if(n.getDay()===0||n.getDay()===6)g='편안한 주말 보내세요 🌿';
+document.getElementById('g').textContent=g;
+document.getElementById('p').textContent=tips[n.getDate()%tips.length];}
+tick();setInterval(tick,1000);
+</script></body></html>
