@@ -2,23 +2,23 @@
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>화이팅!쌤 수업 도구함</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Black+Han+Sans&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#f6f3ff;font-family:'Gowun Dodum',system-ui,sans-serif;color:#2b1d55}
+html,body{background:#f6f3ff;font-family:Pretendard,system-ui,sans-serif;color:#2b1d55}
 .wrap{padding:16px;max-width:900px;margin:0 auto}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .tabs button{border:0;padding:10px 16px;border-radius:999px;background:#fff;font:inherit;font-size:15px;cursor:pointer;box-shadow:0 2px 0 #d9d0ff}
 .tabs button.on{background:#7b5cff;color:#fff}
 .pane{display:none;background:#fff;border-radius:22px;padding:20px;box-shadow:0 4px 0 #d9d0ff;min-height:300px}
 .pane.on{display:block}
-h2{font-family:'Black Han Sans',sans-serif;font-size:20px;color:#7b5cff;margin-bottom:10px}
-.big{font-family:'Black Han Sans',sans-serif;font-size:clamp(64px,16vw,140px);text-align:center;color:#2b1d55;line-height:1.1}
+h2{font-weight:800;font-size:20px;color:#7b5cff;margin-bottom:10px}
+.big{font-weight:800;font-size:clamp(64px,16vw,140px);text-align:center;color:#2b1d55;line-height:1.1}
 .big.done{color:#ff4d7d;animation:b .5s infinite alternate}@keyframes b{to{transform:scale(1.05)}}
 .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
 .btn{border:0;padding:10px 16px;border-radius:14px;font:inherit;font-size:15px;cursor:pointer;background:#efeaff;color:#2b1d55}
 .btn.p{background:#7b5cff;color:#fff}.btn.k{background:#ff7aa8;color:#fff}
 textarea{width:100%;height:90px;border:2px solid #e6dfff;border-radius:14px;padding:10px;font:inherit;font-size:14px}
-.pick{font-family:'Black Han Sans',sans-serif;font-size:clamp(40px,10vw,90px);text-align:center;color:#ff4d7d;min-height:110px;display:flex;align-items:center;justify-content:center}
+.pick{font-weight:800;font-size:clamp(40px,10vw,90px);text-align:center;color:#ff4d7d;min-height:110px;display:flex;align-items:center;justify-content:center}
 .groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
 .g{background:#fff8e7;border:2px solid #ffd76a;border-radius:14px;padding:10px}
 .g b{color:#ff8a00}
@@ -45,7 +45,7 @@ textarea{width:100%;height:90px;border:2px solid #e6dfff;border-radius:14px;padd
 </div>
 
 <div class="pane" id="pick"><h2>🎲 발표자 뽑기</h2>
-<div class="lbl">학생 이름을 줄바꿈 또는 쉼표로 입력하세요 (학생 명렬표에서 이름 열을 복사해 붙여넣기 OK!)</div>
+<div class="lbl">학생 이름을 줄바꿈 또는 쉼표로 입력하세요 (학생 명렬표에서 이름 열을 복사해 붙여넣으세요)</div>
 <textarea id="names" placeholder="예) 김하늘&#10;이바다&#10;박나무"></textarea>
 <label class="lbl"><input type="checkbox" id="nodup" checked> 한 번 뽑힌 학생은 제외</label>
 <div class="pick" id="pk">두근두근 🎉</div>
@@ -75,9 +75,7 @@ function stop(){clearInterval(iv);iv=null;document.getElementById('go').textCont
 function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)();[0,.35,.7].forEach(t=>{const o=c.createOscillator();o.frequency.value=880;o.connect(c.destination);o.start(c.currentTime+t);o.stop(c.currentTime+t+.2);});}catch(e){}}
 function toggle(){if(iv){stop();return;}if(left===0)left=base;document.getElementById('go').textContent='⏸ 일시정지';iv=setInterval(()=>{left--;show();if(left<=0){left=0;show();stop();beep();}},1000);}
 show();
-const ta=document.getElementById('names');try{ta.value=localStorage.getItem('ht_names')||'';}catch(e){}
-ta.oninput=()=>{try{localStorage.setItem('ht_names',ta.value);}catch(e){}};
-let used=[];
+const ta=document.getElementById('names');let used=[];
 function list(){return ta.value.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);}
 function pick(){let L=list();if(document.getElementById('nodup').checked)L=L.filter(n=>!used.includes(n));
 const pk=document.getElementById('pk');if(!L.length){pk.textContent=list().length?'모두 뽑혔어요! 🎊':'명단을 입력해 주세요';return;}
