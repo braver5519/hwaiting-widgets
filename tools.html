@@ -10,7 +10,7 @@ body{min-height:100vh}
 button,input,textarea,select{font:inherit;color:inherit}
 .app{max-width:1100px;margin:0 auto;padding:14px 16px 18px}
 /* top */
-.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px;position:sticky;top:0;z-index:10;background:var(--bg);padding:6px 0}
 .brand{font-weight:800;font-size:15px;letter-spacing:-.01em;white-space:nowrap}
 .brand span{background:linear-gradient(90deg,var(--p),var(--p2));-webkit-background-clip:text;color:transparent}
 .nav{display:flex;gap:6px;overflow-x:auto;flex:1;padding:2px;scrollbar-width:none}
@@ -21,7 +21,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 .icon-btn{flex:none;border:0;background:#fff;width:38px;height:38px;border-radius:12px;cursor:pointer;box-shadow:0 0 0 1px var(--line) inset;font-size:16px}
 .icon-btn:hover{background:var(--soft)}
 /* card */
-.pane{display:none;background:var(--card);border-radius:24px;padding:22px;box-shadow:0 1px 0 var(--line),0 12px 40px rgba(60,40,160,.06);min-height:440px;position:relative}
+.pane{display:none;background:var(--card);border-radius:24px;padding:22px;box-shadow:0 1px 0 var(--line),0 12px 40px rgba(60,40,160,.06);min-height:min(440px,calc(100vh - 110px));position:relative}
 .pane.on{display:block;animation:in .25s ease}
 @keyframes in{from{opacity:0;transform:translateY(6px)}}
 .ph{display:flex;align-items:baseline;gap:10px;margin-bottom:16px;flex-wrap:wrap}
@@ -55,7 +55,7 @@ input[type=number]{width:76px;text-align:center}
 
 /* timer */
 .tw{display:flex;flex-direction:column;align-items:center;gap:18px}
-.ring{position:relative;width:min(320px,70vw);aspect-ratio:1}
+.ring{position:relative;width:min(300px,70vw,52vh);aspect-ratio:1}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ring .tx{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .ring .t{font-size:clamp(52px,12vw,84px);font-weight:300;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
@@ -105,7 +105,7 @@ input[type=number]{width:76px;text-align:center}
 .st.bump .sc{animation:pop .35s}
 
 /* wheel */
-.wh{position:relative;width:min(420px,80vw);aspect-ratio:1;margin:0 auto}
+.wh{position:relative;width:min(420px,80vw,62vh);aspect-ratio:1;margin:0 auto}
 .wh canvas{width:100%;height:100%}
 .wh .ptr{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:30px solid var(--ink);filter:drop-shadow(0 3px 3px rgba(0,0,0,.2))}
 .wh .hub{position:absolute;inset:0;margin:auto;width:70px;height:70px;border-radius:50%;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);border:0;font-weight:800;cursor:pointer;font-size:14px}
@@ -334,7 +334,7 @@ const COLORS=['#6c4dff','#ff5f9e','#16b3a3','#ff9a3d','#3d8bff','#a64dff','#22c2
 const nav=$('#nav');
 TOOLS.forEach(([id,l])=>{const b=document.createElement('button');b.textContent=l;b.dataset.t=id;b.onclick=()=>show(id);nav.appendChild(b)});
 function show(id){$$('.pane').forEach(p=>p.classList.toggle('on',p.id===id));$$('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===id));history.replaceState(null,'','#'+id);
- const b=$(`.nav button[data-t=${id}]`);b&&b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});if(id==='wheel')drawWheel();if(id==='seat'&&!$('#seats').children.length)seatGrid([]);}
+ const b=$(`.nav button[data-t=${id}]`);if(b){nav.scrollTo({left:b.offsetLeft-nav.clientWidth/2+b.offsetWidth/2,behavior:'smooth'})}window.scrollTo(0,0);if(id==='wheel')drawWheel();if(id==='seat'&&!$('#seats').children.length)seatGrid([]);}
 show((location.hash.slice(1)&&TOOLS.some(t=>t[0]===location.hash.slice(1)))?location.hash.slice(1):'timer');
 /* fullscreen: iframe 안이면 새 창 */
 $('#fsb').onclick=()=>{const inFrame=window.self!==window.top;
