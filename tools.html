@@ -154,6 +154,13 @@ input[type=range]{width:100%;max-width:640px;accent-color:var(--p)}
 .seat{border-radius:14px;background:#f4f2fb;min-height:54px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;text-align:center;padding:6px;transition:.3s}
 .seat.f{background:#fff;box-shadow:0 0 0 1.5px var(--line) inset,0 4px 10px rgba(60,40,160,.06)}
 .seat.flip{animation:flip .5s ease both}
+.seats{touch-action:none}
+.seat.f{cursor:grab;user-select:none}
+.seat.drag-src{opacity:.35;animation:none}
+.seat.drop-on{box-shadow:0 0 0 3px var(--p) inset!important;background:var(--soft)}
+.seat.swapped{animation:pop .35s ease}
+.ghost{position:fixed;z-index:60;pointer-events:none;padding:10px 16px;border-radius:14px;background:var(--p);color:#fff;font-weight:800;font-size:16px;box-shadow:0 12px 28px rgba(60,40,160,.35);transform:translate(-50%,-50%) rotate(-3deg)}
+.shint{font-size:12.5px;color:var(--sub);text-align:center;margin-top:10px}
 @keyframes flip{0%{transform:rotateY(90deg);opacity:0}100%{transform:none;opacity:1}}
 
 /* confetti */
@@ -320,7 +327,7 @@ body.fs .pane{min-height:calc(100vh - 90px)}
    <button class="btn p" id="sgo2">🔀 자리 섞기</button>
    <button class="btn sm" onclick="print()">🖨️ 인쇄</button>
   </div>
-  <div><div class="desk">📺 칠판 · 교탁</div><div class="seats" id="seats"></div></div>
+  <div><div class="desk">📺 칠판 · 교탁</div><div class="seats" id="seats"></div><div class="shint noprint">✋ 섞은 뒤 이름을 <b>끌어서</b> 다른 자리에 놓으면 서로 바뀌어요 (빈자리로도 옮길 수 있어요)</div></div>
  </div>
 </section>
 
@@ -480,11 +487,22 @@ function eTick(){const n=new Date();$('#enow').textContent=`${pad(n.getHours())}
 setInterval(eTick,250);eTick();
 
 /* 10 자리 */
-function seatGrid(list){const c=Math.max(1,+$('#scol').value||6),r=Math.max(1,+$('#srow').value||5),pair=$('#spair').checked;
+var SEATS=[];
+function seatGrid(list,still,hit){const c=Math.max(1,+$('#scol').value||6),r=Math.max(1,+$('#srow').value||5),pair=$('#spair').checked;
+ SEATS=Array.from({length:r*c},(_,i)=>list[i]||'');
  const box=$('#seats');let cols=[];for(let i=0;i<c;i++){cols.push('1fr');if(pair&&i%2===1&&i<c-1)cols.push('18px')}box.style.gridTemplateColumns=cols.join(' ');
- let html='',k=0;for(let y=0;y<r;y++)for(let x=0;x<c;x++){const nm=list[k++];html+=`<div class="seat ${nm?'f flip':''}" style="animation-delay:${(y*c+x)*.03}s">${nm?esc(nm):''}</div>`;if(pair&&x%2===1&&x<c-1)html+='<div></div>'}
+ let html='',k=0;for(let y=0;y<r;y++)for(let x=0;x<c;x++){const i=k++,nm=SEATS[i];const cls=nm?('f'+(still?'':' flip')+(hit&&hit.includes(i)?' swapped':'')):'';html+=`<div class="seat ${cls}" data-k="${i}" style="animation-delay:${still?0:(y*c+x)*.03}s">${nm?esc(nm):''}</div>`;if(pair&&x%2===1&&x<c-1)html+='<div></div>'}
  box.innerHTML=html;if(list.length>r*c)box.insertAdjacentHTML('afterend','')}
 $('#sgo2').onclick=()=>{if(!NAMES.length){seatGrid([]);return}const c=+$('#scol').value||6,r=+$('#srow').value||5;if(NAMES.length>c*r){$('#srow').value=Math.ceil(NAMES.length/c)}seatGrid(shuffle(NAMES));chime()};
-['#scol','#srow','#spair'].forEach(s=>$(s).addEventListener('change',()=>seatGrid([])));
+['#scol','#srow','#spair'].forEach(s=>$(s).addEventListener('change',()=>seatGrid(SEATS.filter(Boolean),true)));
+/* 끌어서 자리 옮기기 (마우스·터치 공통) */
+(function(){let src=null,ghost=null,over=null,sx=0,sy=0,moved=false;
+ const seatAt=(x,y)=>{const el=document.elementFromPoint(x,y);return el&&el.closest?el.closest('#seats .seat'):null};
+ $('#seats').addEventListener('pointerdown',e=>{const s=e.target.closest('.seat.f');if(!s||e.button>0)return;e.preventDefault();src=s;sx=e.clientX;sy=e.clientY;moved=false});
+ window.addEventListener('pointermove',e=>{if(!src)return;if(!moved){if(Math.hypot(e.clientX-sx,e.clientY-sy)<6)return;moved=true;src.classList.add('drag-src');ghost=document.createElement('div');ghost.className='ghost';ghost.textContent=src.textContent;document.body.appendChild(ghost)}
+  ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px';const t=seatAt(e.clientX,e.clientY);const nt=t&&t!==src?t:null;if(nt!==over){over&&over.classList.remove('drop-on');over=nt;over&&over.classList.add('drop-on')}});
+ const end=()=>{if(!src)return;if(moved&&over){const a=+src.dataset.k,b=+over.dataset.k;const L=[...SEATS];[L[a],L[b]]=[L[b],L[a]];seatGrid(L,true,[a,b]);tone(780,.15)}
+  else src.classList.remove('drag-src');over&&over.classList.remove('drop-on');ghost&&ghost.remove();src=ghost=over=null;moved=false};
+ window.addEventListener('pointerup',end);window.addEventListener('pointercancel',end)})();
 </script>
 </body></html>
