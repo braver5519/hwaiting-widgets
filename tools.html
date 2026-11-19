@@ -168,8 +168,19 @@ input[type=range]{width:100%;max-width:640px;accent-color:var(--p)}
 .foot{text-align:center;font-size:11.5px;color:var(--sub);margin-top:12px;opacity:.8}
 
 /* fullscreen big */
-body.fs .app{max-width:none;padding:18px 28px}
-body.fs .pane{min-height:calc(100vh - 90px)}
+/* 화면 맞춤: 넓은 화면(노션 임베드·전체화면·TV)은 1100px 기준 화면을 통째로 확대·축소 */
+html.zm body{overflow-x:hidden}
+html.zm .app{zoom:var(--z);width:1100px;max-width:1100px}
+html.zm .pane{min-height:calc(var(--ah) - 128px)}
+html.zm .ring{width:290px}html.zm .tw{gap:13px}html.zm .ring .t{font-size:84px}
+html.zm .slot .nm{font-size:76px}html.zm .sigbig{font-size:52px}
+html.zm .wh{width:420px}html.zm .res{font-size:40px}
+html.zm .stage .nm{font-size:52px}html.zm .stage .t{font-size:96px}
+html.zm .nzmsg{font-size:40px}
+html.zm .ex .sub{font-size:30px}html.zm .ex .now{font-size:150px}html.zm .ex .info b{font-size:40px}
+/* 전체화면처럼 세로 여유가 크면 주인공 요소를 더 크게 */
+html.zm.tall .ring{width:340px}html.zm.tall .ring .t{font-size:96px}
+html.zm.tall .wh{width:470px}html.zm.tall .slot{height:190px}html.zm.tall .slot .nm{font-size:92px}
 @media print{.top,.side,.foot,.noprint{display:none!important}.pane{box-shadow:none}.split{grid-template-columns:1fr}}
 </style></head>
 <body>
@@ -347,7 +358,11 @@ show((location.hash.slice(1)&&TOOLS.some(t=>t[0]===location.hash.slice(1)))?loca
 $('#fsb').onclick=()=>{const inFrame=window.self!==window.top;
  if(document.fullscreenElement){document.exitFullscreen();return}
  const el=document.documentElement;if(!inFrame&&el.requestFullscreen){el.requestFullscreen().catch(()=>{});}else{window.open(location.href.split('#')[0]+location.hash,'_blank');}};
-document.addEventListener('fullscreenchange',()=>document.body.classList.toggle('fs',!!document.fullscreenElement));
+function fitScreen(){const W=innerWidth,H=innerHeight,r=document.documentElement;
+ if(W<720){r.classList.remove('zm','tall');r.style.removeProperty('--z');return}
+ const z=Math.max(.7,Math.min(2.6,Math.min(W/1120,H/700)));const ah=H/z;
+ r.classList.add('zm');r.classList.toggle('tall',ah>760);r.style.setProperty('--z',z);r.style.setProperty('--ah',ah+'px')}
+addEventListener('resize',fitScreen);document.addEventListener('fullscreenchange',fitScreen);fitScreen();
 
 /* 공용 명단 */
 const nameBoxes=$$('.names');let NAMES=[];
